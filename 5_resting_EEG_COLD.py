@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 Created on Wed Feb 15 22:31:21 2023
-
+includes softreset of the EEG
 @author: albertogonzalezv
 """
 
@@ -14,6 +14,7 @@ from datetime import datetime
 from os import sep
 import serial.tools.list_ports
 from explorepy.tools import get_local_time
+from explorepy.command import SoftReset
 
 
 eeg_duration = 300
@@ -44,6 +45,8 @@ def connect_explore(dev_name):
 def on_close():
     global explore
     if explore:
+        cmd = SoftReset()
+        explore.stream_processor.configure_device(cmd)
         explore.disconnect()
     if serCPM:
         serCPM.close()

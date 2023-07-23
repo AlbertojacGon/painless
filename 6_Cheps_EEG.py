@@ -14,6 +14,7 @@ from datetime import datetime
 from os import sep
 import serial.tools.list_ports
 from explorepy.tools import get_local_time
+from explorepy.command import SoftReset
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
@@ -46,6 +47,8 @@ def connect_explore(dev_name):
 def on_close():
     global explore
     if explore:
+        cmd = SoftReset()
+        explore.stream_processor.configure_device(cmd)
         explore.disconnect()
     if ser:
         ser.close()
