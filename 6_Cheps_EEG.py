@@ -33,12 +33,12 @@ STOP =0
 dataS= 60
 # connect
 def connect_explore(dev_name):
-    
+
     global explore
     explore = explorepy.Explore()
     explorepy.set_bt_interface('sdk')
     explore.connect(device_name=dev_name_entry.get())
-    
+
     eeg_dev = True
     if eeg_dev:
         connectEEG_button.config(state=tk.DISABLED)
@@ -53,7 +53,7 @@ def on_close():
     if ser:
         ser.close()
     root.destroy()
-    
+
 def start_rec():
     global folder, STOP, time_cont, trial_cont, dataS
     if test_user():
@@ -61,18 +61,21 @@ def start_rec():
         explore.record_data(file_name=(folder + sep + user_id + current_time+'_' + str(trial_cont)), file_type='csv')
         stop_button.config(state="normal")
         start_button.config(state="disabled")
+        explore.set_marker(code=999)
         STOP = False
         while trial_cont<eeg_trials:
             t0=time.time()
             time_cont=0
             if not STOP:
-                while time.time()-t0<9.9:               
+                while time.time()-t0<9.9:
                     if not STOP:
                         if (time.time()-t0)>time_cont:
-                            
+
                             tempTCS_message2.config(text=('Wait for:'+str(10-time_cont)))
                             tempTCS_message2.update_idletasks()
                             time_cont+=1
+                            if time_cont<5:
+                                explore.set_marker(code=999)
                         root.update()
                         time.sleep(.001)
                     else:break
@@ -83,11 +86,13 @@ def start_rec():
                     crono.config(text = ("Trials: " +str(trial_cont) +'/'+str(eeg_trials)))
             else: break
         if trial_cont>=eeg_trials:
-            crono.config(text ="Finished. Stop and Save Pain") 
-        
+            crono.config(text ="Finished. Stop and Save Pain")
+
 
 def stop_rec():
     global STOP
+    explore.set_marker(code=998)
+    time.sleep(.01)
     explore.stop_recording()
     STOP = True
     start_button.config(state="normal")
@@ -117,8 +122,8 @@ def save_comments():
         notes_save_button.config(state="disabled")  # disable the button
         notes_save_button.after(100, lambda: notes_save_button.config(state="normal"))
         notes_entry.delete(0, tk.END)
-        
-        
+
+
 
 def save_pain():
     global folder
@@ -127,8 +132,8 @@ def save_pain():
         writer = csv.writer(file)
         writer.writerow([user_id, 'FinalPain',pain_scale.get(), get_local_time()])
     pain_saved_label.config(text='Done')
-        
-        
+
+
 def save_other(data1, data2):
     global folder
     user_id = id_entry.get()
@@ -136,17 +141,17 @@ def save_other(data1, data2):
         writer = csv.writer(file)
         writer.writerow([user_id, data1, data2, get_local_time()])
 
-    
+
 def stream():
     #explore.acquire()
     explore.visualize( bp_freq=(1, 30), notch_freq=50)
-    
-def impeds(): 
+
+def impeds():
     explore.measure_imp()
 
 
 
-  
+
 def send_data(data_out): # send by serial
     if ser!=False:
         for i in data_out:
@@ -158,7 +163,7 @@ def read_data(): # read serial
         while ser.inWaiting():
             incoming = incoming + ser.read().decode()
         return(incoming)
-    
+
 
 def connect():
     global ser
@@ -166,16 +171,16 @@ def connect():
         port_idx = port_listbox.curselection()[0] # Obtiene el índice de la selección actual
         port = port_listbox.get(port_idx) # Obtiene el puerto seleccionado en el índice
         baud_rate = 115200
-        
+
         try:
             ser = serial.Serial(port, baud_rate, timeout=0)
             status_label.config(text="TCS Connected to " + port)
             connect_button.config(state="disabled")
             disconnect_button.config(state="normal")
-            notes_save_button.config(state="normal")  
-            pain_save_button.config(state="normal")  
-            SetTCSButt.config(state="normal")  
-            plot_button.config(state="normal") 
+            notes_save_button.config(state="normal")
+            pain_save_button.config(state="normal")
+            SetTCSButt.config(state="normal")
+            plot_button.config(state="normal")
             start_save()
             send_data('F') # stimulation time = 500ms
             time.sleep(0.05)
@@ -193,8 +198,8 @@ def connect():
             time.sleep(0.005)
             send_data('C0600')
             time.sleep(0.005)
-            
-    
+
+
         except serial.SerialException:
             status_label.config(text="Error: Could not connect to " + port)
 
@@ -212,23 +217,23 @@ def refresh():
     port_listbox.delete(0, tk.END)
     for port, desc, hwid in sorted(ports):
         port_listbox.insert(tk.END, port)
-        
-        
+
+
 def update_temps():
     global incoming
     if ser is not None and ser.isOpen():
         try:
-            incoming = ser.read(1000)   
+            incoming = ser.read(1000)
             ser.write('E'.encode())
             temps_read = [float(x)/10 for x in incoming.decode().split('+')]
             temps_read = temps_read[1:6]
             if len(temps_read)==5:
-                    
+
                 return(temps_read)
             else:
                 return([0,0,0,0,0])
         except: return([0,0,0,0,0])
-    
+
 
 
 def sendtemp():
@@ -239,11 +244,11 @@ def sendtemp():
     send_data(data)
     save_other('ChepsTemp',dataS)
     tempTCS_message.config(text = ('Current Temp: '+dataS+ 'C'))
-    
+
 def coldTest():
     global start_time
     cont = 0
-    tWait = 30 
+    tWait = 30
     start_time = time.time()
     while cont<=tWait:
         if (time.time()-start_time)>cont:
@@ -251,7 +256,7 @@ def coldTest():
             cont+=1
             tempTCS_message2.update_idletasks()
         root.update()
-    
+
 
 datax = [0]
 y1 = [0]
@@ -309,8 +314,8 @@ def toggle_plot():
         # If the callback is defined, stop updating the plot
         plot_callback = None
         plot_button.config(text="Show Temps Plot")
-        
-        
+
+
 root = tk.Tk()
 root.title("CHEPS EEG")
 root.iconbitmap('painlessLogo.ico')
@@ -449,5 +454,3 @@ refresh()
 
 root.protocol("WM_DELETE_WINDOW", on_close)
 root.mainloop()
-
-    

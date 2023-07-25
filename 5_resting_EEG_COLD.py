@@ -31,12 +31,12 @@ STOP =0
 incomingCPM = []
 # connect
 def connect_explore(dev_name):
-    
+
     global explore
     explore = explorepy.Explore()
     explorepy.set_bt_interface('sdk')
     explore.connect(device_name=dev_name_entry.get())
-    
+
     eeg_dev = True
     if eeg_dev:
         connect_button.config(state=tk.DISABLED)
@@ -51,12 +51,13 @@ def on_close():
     if serCPM:
         serCPM.close()
     root.destroy()
-    
+
 def start_rec():
     global folder, STOP, time_cont
     if test_user():
         user_id = id_entry.get()
         explore.record_data(file_name=(folder + sep + user_id + current_time+'_' + str(time_cont)), duration=eeg_duration, file_type='csv')
+        explore.set_marker(code=888)
         stop_button.config(state="normal")
         start_button.config(state="disabled")
         STOP = False
@@ -67,13 +68,17 @@ def start_rec():
                     root.update()
                     time.sleep(.001)
                 time_cont+=1
+                if time_cont<5:
+                    explore.set_marker(code=888)
                 crono.config(text = ("Seconds " +str(time_cont) +'/'+str(eeg_duration)))
             else: break
             time.sleep(.001)
-        
+
 
 def stop_rec():
     global STOP
+    explore.set_marker(code=889)
+    time.sleep(.01)
     explore.stop_recording()
     STOP = True
     start_button.config(state="normal")
@@ -103,7 +108,7 @@ def save_comments():
         notes_save_button.config(state="disabled")  # disable the button
         notes_save_button.after(100, lambda: notes_save_button.config(state="normal"))
         notes_entry.delete(0, tk.END)
-        
+
 def save_handUp():
     global folder
     user_id = id_entry.get()
@@ -112,7 +117,7 @@ def save_handUp():
         writer.writerow([user_id, 'HAND UP', ' ',get_local_time()])
         handdwButt.config(state="normal")
         handupButt.config(state="disabled")
-        
+
 
 def save_handDw():
     global folder
@@ -130,7 +135,7 @@ def save_pain():
         writer = csv.writer(file)
         writer.writerow([user_id, 'FinalPain', pain_scale.get() ,get_local_time()])
         pain_saved_label.config(text='Done')
-        
+
 def save_other(data1, data2):
     global folder
     user_id = id_entry.get()
@@ -139,24 +144,24 @@ def save_other(data1, data2):
         writer.writerow([user_id, data1, data2, get_local_time()])
         handdwButt.config(state="disabled")
         handupButt.config(state="normal")
-    
+
 def stream():
     #explore.acquire()
     explore.visualize( bp_freq=(1, 30), notch_freq=50)
-    
-def impeds(): 
+
+def impeds():
     explore.measure_imp()
 
 
 
-  
-    
+
+
 def send_dataCPM(data_out): # send by serial
     if serCPM!=False:
         for i in data_out:
             serCPM.write(i.encode())
             time.sleep(0.002)
-    
+
 
 def connectCPM():
     global serCPM
@@ -168,19 +173,19 @@ def connectCPM():
             serCPM = serial.Serial(portCPM, baud_rate)
             statusCPM_label.config(text="Cold Plate Connected to " + portCPM)
             connectCPM_button.config(state="disabled")
-            disconnectCPM_button.config(state="normal")  
-            SetCPButt.config(state="normal")  
-            CPButt.config(state="normal")  
-            handupButt.config(state="normal")  
-            notes_save_button.config(state="normal")  
-            pain_save_button.config(state="normal")  
+            disconnectCPM_button.config(state="normal")
+            SetCPButt.config(state="normal")
+            CPButt.config(state="normal")
+            handupButt.config(state="normal")
+            notes_save_button.config(state="normal")
+            pain_save_button.config(state="normal")
             start_save()
             #send_buttonCPM.config(state="normal")
             send_dataCPM('C200') # temp to 20.0
             time.sleep(0.005)
-            #temps_message.config(text="Select CPM Pain5 temp and wait for the Cold Plate to reach 10C") 
-            
-    
+            #temps_message.config(text="Select CPM Pain5 temp and wait for the Cold Plate to reach 10C")
+
+
         except serial.SerialException:
             statusCPM_label.config(text="Error: Could not connect to " + portCPM)
 
@@ -198,7 +203,7 @@ def refreshCPM():
     portCPM_listbox.delete(0, tk.END)
     for portCPM, desc, hwid in sorted(portsCPM):
         portCPM_listbox.insert(tk.END, portCPM)
-        
+
 def update_tempsCPM():
     global incomingCPM, serCPM
     if serCPM is not None and serCPM.isOpen():
@@ -212,7 +217,7 @@ def update_tempsCPM():
             temp = (float(temps_read[0])/10)
             tempCP_message.config(text=('Current Cold Plate Temp:'+ str(temp) + 'C'))
     root.after(1000, update_tempsCPM)
-    
+
 def change_tempsCPM(newtemp):
     send_dataCPM(('C'+str(newtemp)+'0')) # temp to 10.0
     time.sleep(0.005)
@@ -224,11 +229,11 @@ def sendCPtemp():
     data = 'C' +dataS+ '0'
     send_dataCPM(data)
     save_other('ColdPlateTemp',dataS)
-    
+
 def coldTest():
     global start_time
     cont = 0
-    tWait = 30 
+    tWait = 30
     start_time = time.time()
     while cont<=tWait:
         if (time.time()-start_time)>cont:
@@ -236,7 +241,7 @@ def coldTest():
             cont+=1
             tempCP_message2.update_idletasks()
         root.update()
-    
+
 
 root = tk.Tk()
 root.title("Resting EEG during Cold Pain")
@@ -361,5 +366,3 @@ update_tempsCPM()
 
 root.protocol("WM_DELETE_WINDOW", on_close)
 root.mainloop()
-
-    
