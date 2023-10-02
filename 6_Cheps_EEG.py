@@ -58,7 +58,7 @@ def start_rec():
     global folder, STOP, time_cont, trial_cont, dataS
     if test_user():
         user_id = id_entry.get()
-        explore.record_data(file_name=(folder + sep + user_id + current_time+'_' + str(trial_cont)), file_type='csv')
+        explore.record_data(file_name=(folder + sep + user_id + current_time+'_' + str(trial_cont) + 'Cheps'), file_type='csv')
         stop_button.config(state="normal")
         start_button.config(state="disabled")
         explore.set_marker(code=999)
@@ -116,7 +116,7 @@ def save_comments():
             os.makedirs(folder)
         user_id = id_entry.get()
         notes = notes_entry.get()
-        with open((folder +sep+ user_id +'_' + current_time +'NOTES.csv'), mode='a', newline='') as file:
+        with open((folder +sep+ user_id +'_' + current_time +'NOTESCheps.csv'), mode='a', newline='') as file:
             writer = csv.writer(file)
             writer.writerow([user_id, 'COMMENT', notes,get_local_time()])
         notes_save_button.config(state="disabled")  # disable the button
@@ -128,7 +128,7 @@ def save_comments():
 def save_pain():
     global folder
     user_id = id_entry.get()
-    with open((folder +sep+ user_id +'_' + current_time +'NOTES.csv'), mode='a', newline='') as file:
+    with open((folder +sep+ user_id +'_' + current_time +'NOTESCheps.csv'), mode='a', newline='') as file:
         writer = csv.writer(file)
         writer.writerow([user_id, 'FinalPain',pain_scale.get(), get_local_time()])
     pain_saved_label.config(text='Done')
@@ -137,7 +137,7 @@ def save_pain():
 def save_other(data1, data2):
     global folder
     user_id = id_entry.get()
-    with open((folder +sep+ user_id +'_' + current_time +'NOTES.csv'), mode='a', newline='') as file:
+    with open((folder +sep+ user_id +'_' + current_time +'NOTESCheps.csv'), mode='a', newline='') as file:
         writer = csv.writer(file)
         writer.writerow([user_id, data1, data2, get_local_time()])
 

@@ -9,7 +9,7 @@ Created on Thu Feb 16 10:38:45 2023
 
 
 
-import serial 
+import serial
 import csv, time, os
 import tkinter as tk
 import serial.tools.list_ports
@@ -38,8 +38,8 @@ def read_data(): # read serial
         while ser.inWaiting():
             incoming = incoming + ser.read().decode()
         return(incoming)
-    
-    
+
+
 def connect():
     global ser
     port_idx = port_listbox.curselection()[0] # Obtiene el índice de la selección actual
@@ -53,7 +53,7 @@ def connect():
         disconnect_button.config(state="normal")
         send_buttonTSP.config(state="normal")
         save_buttonTSP.config(state="normal")
-        
+
         temps_message.config(text="Select the correct TSP Pain5 temp and press Stim 1")
         send_data('F') # stimulation time = 500ms
         time.sleep(0.005)
@@ -89,8 +89,8 @@ def on_close():
     if serCPM:
         serCPM.close()
     root.destroy()
-    
-# countdown 
+
+# countdown
 
 def countdown():
     global start_time
@@ -107,13 +107,13 @@ def reset_countdown():
     global start_time
     start_time = None
     countdown_label.config(text='')
-    
+
 def countdown2():
     global start_time
     if start_time is not None:
         remaining_time = start_time - time.time()
         if remaining_time <= 0 and temps_message.cget('text') == "Rate pain cold plate in:":
-            save_buttonCP.config(state="normal") 
+            save_buttonCP.config(state="normal")
             temps_message.config(text="Test Stim Post in:")
             start_time = time.time() + 10  # start countdown again with 10 seconds
             countdown2()  # start the countdown again
@@ -136,25 +136,25 @@ def count20():
     start_time = time.time() + 20
     temps_message.config(text="Rate pain cold plate in:")
     countdown2()
-    
-    
-    
+
+
+
 
 def update_temps():
     global incoming
     if ser is not None and ser.isOpen():
         try:
-            incoming = ser.read(1000)   
+            incoming = ser.read(1000)
             ser.write('E'.encode())
             temps_read = [float(x)/10 for x in incoming.decode().split('+')]
             temps_read = temps_read[1:6]
             if len(temps_read)==5:
-                    
+
                 return(temps_read)
             else:
                 return([0,0,0,0,0])
         except: return([0,0,0,0,0])
-    
+
 def test_user():
     user_id = id_entry.get()
     if user_id == '':
@@ -170,29 +170,29 @@ def start_save():
         if not os.path.exists(folder):
             os.makedirs(folder)
         user_id = id_entry.get()
-        with open((folder +sep+ user_id +'_' + current_time +'.csv'), mode='a', newline='') as file:
+        with open((folder +sep+ user_id +'_' + current_time +'TSP_CPM.csv'), mode='a', newline='') as file:
             writer = csv.writer(file)
-            writer.writerow(["participant_id", "TrialType", "Temp","datetime"])  
-            
+            writer.writerow(["participant_id", "TrialType", "Temp","datetime"])
+
 def save_results(data1,concept):
     global folder
     user_id = id_entry.get()
-    with open((folder +sep+ user_id +'_' + current_time +'.csv'), mode='a', newline='') as file:
+    with open((folder +sep+ user_id +'_' + current_time +'TSP_CPM.csv'), mode='a', newline='') as file:
         writer = csv.writer(file)
-        writer.writerow([user_id, concept, data1, datetime.datetime.now().time()])     
+        writer.writerow([user_id, concept, data1, datetime.datetime.now().time()])
 
 
 
-    
+
 def stimTSP1():
     global ser
-    global start_time    
+    global start_time
     dataS = float(send_varTSP.get())
     datstr = str(dataS).replace('.','')
     if dataS<10:
         datstr= '0' + datstr
     data = 'C0' +datstr
-    send_data(data)   
+    send_data(data)
     time.sleep(0.003)
     send_data('D000500') # stimulation time = 5s
     time.sleep(0.003)
@@ -202,7 +202,7 @@ def stimTSP1():
     save_buttonTSP.config(state="normal")  # disable the button
     send_buttonTSP.after(500, lambda: send_buttonTSP.config(state="normal"))  # enable the button after 500 ms
     start_time = time.time() + 11
-    temps_message.config(text="Save now TSP Stim1 Pain") 
+    temps_message.config(text="Save now TSP Stim1 Pain")
     countdown()
 
 def stimTSP10():
@@ -210,7 +210,7 @@ def stimTSP10():
 
     StartTSPtime = time.time()
     cont=0
-    temps_message.config(text="Next Step: Save TSP Stim10 Pain") 
+    temps_message.config(text="Next Step: Save TSP Stim10 Pain")
     while cont<10:
         if  (time.time()- StartTSPtime)>cont:
             cont+=1
@@ -228,14 +228,14 @@ def save_tempTSP():
         save_results(send_varTSP.get(),'tempTSP')
         start_time = time.time() + 5
         countdown()
-        
-        
+
+
 def save_scoreTSP():
     if test_user():
         save_results(score_scaleTSP.get(),'vasTSP1')
-        temps_message.config(text="Press Stim10 when time=0") 
-        send_buttonTSP10.config(state="normal") 
-        send_buttonTSP.config(state="disabled") 
+        temps_message.config(text="Press Stim10 when time=0")
+        send_buttonTSP10.config(state="normal")
+        send_buttonTSP.config(state="disabled")
         save_buttonTSP.config(state="disabled")  # disable the button
         save_buttonTSP.after(200, lambda: save_buttonTSP.config(state="normal"))  # enable the button after 500 ms
         info_TSP_label.config(text="Done: " + str(score_scaleTSP.get()))
@@ -245,16 +245,16 @@ def save_scoreTSP10():
         global start_time
         start_time = time.time() + 60
         save_results(score_scaleTSP10.get(),'vasTSP10')
-        temps_message.config(text="Next Step: Connect Cold Plate") 
-        send_buttonTSP.config(state="normal") 
-        send_buttonTSP10.config(state="disabled") 
+        temps_message.config(text="Next Step: Connect Cold Plate")
+        send_buttonTSP.config(state="normal")
+        send_buttonTSP10.config(state="disabled")
         save_buttonTSP10.config(state="disabled")  # disable the button
         save_buttonTSP10.after(200, lambda: save_buttonTSP10.config(state="normal"))  # enable the button after 500 ms
         info_TSP10_label.config(text="Done: " + str(score_scaleTSP10.get()))
         countdown()
-           
-           
-    
+
+
+
 def send_tempsCPM():
     global ser
     dataS = float(send_varCPM.get())
@@ -264,7 +264,7 @@ def send_tempsCPM():
         datstr= '0' + datstr
     data = 'C0' +datstr
     print(data)
-    send_data(data)   
+    send_data(data)
     time.sleep(0.1)
     send_data('D010000') # stimulation time = 10
     time.sleep(0.1)
@@ -274,7 +274,7 @@ def send_tempsCPM():
     temps_message.config(text="Next Step: Save Pain Test Stim Pre")
     save_buttonCPM.config(state="normal")
     send_buttonCPM.after(9000, lambda: send_buttonCPM.config(state="normal"))  # enable the button after 500 ms
-    
+
 
 
 def save_tempCPM():
@@ -283,7 +283,7 @@ def save_tempCPM():
         save_results(send_varCPM.get(),'tempCPM')
         start_time = time.time() + 10
         countdown()
-        
+
 
 def save_scoreCPM():
     if test_user():
@@ -292,7 +292,7 @@ def save_scoreCPM():
         button20CPM.config(state="normal")
         temps_message.config(text="Next Step: Palm of non-dominant hand in cold for 40s")
         info_CPM_label.config(text=("Done: " + str(score_scaleCPM.get())))
-        
+
 
 def save_scoreCP():
     global startTempCPM
@@ -330,9 +330,9 @@ def update_tempsCPM():
             temp = (float(temps_read[0])/10)
         tempCP_message.config(text=('Cold Plate Temp:'+ str(temp) + 'C'))
     temps_label.after(1000, update_tempsCPM)
-    
-    
-    
+
+
+
 def connectCPM():
     global serCPM
     portCPM_idx = portCPM_listbox.curselection()[0] # Obtiene el índice de la selección actual
@@ -342,12 +342,12 @@ def connectCPM():
         serCPM = serial.Serial(portCPM, baud_rate)
         statusCPM_label.config(text="Cold Plate Connected to " + portCPM)
         connectCPM_button.config(state="disabled")
-        disconnectCPM_button.config(state="normal")  
+        disconnectCPM_button.config(state="normal")
         send_buttonCPM.config(state="normal")
         send_dataCPM('C100') # temp to 10.0
         time.sleep(0.005)
-        temps_message.config(text="Select CPM Pain5 temp and wait for the Cold Plate to reach 10C") 
-        
+        temps_message.config(text="Select CPM Pain5 temp and wait for the Cold Plate to reach 10C")
+
 
     except serial.SerialException:
         statusCPM_label.config(text="Error: Could not connect to " + portCPM)
@@ -366,7 +366,7 @@ def refreshCPM():
     portCPM_listbox.delete(0, tk.END)
     for portCPM, desc, hwid in sorted(portsCPM):
         portCPM_listbox.insert(tk.END, portCPM)
-        
+
 
 
 datax = [0]
@@ -428,7 +428,7 @@ def toggle_plot():
 
 
 
-    
+
 ser = None
 serCPM = None
 

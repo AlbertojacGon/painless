@@ -10,7 +10,7 @@ Created on Thu Feb 16 10:38:45 2023
 @author: albertogonzalezv
 """
 
-import serial 
+import serial
 import csv, time, os
 import tkinter as tk
 import serial.tools.list_ports
@@ -41,8 +41,8 @@ def read_data(): # read serial
         while ser.inWaiting():
             incoming = incoming + ser.read().decode()
         return(incoming)
-    
-    
+
+
 def connect():
     global ser
     port_idx = port_listbox.curselection()[0] # Obtiene el índice de la selección actual
@@ -99,7 +99,7 @@ def on_close():
     if ser:
         ser.close()
     root.destroy()
-# countdown 
+# countdown
 
 def countdown():
     global start_time
@@ -116,13 +116,13 @@ def reset_countdown():
     global start_time
     start_time = None
     countdown_label.config(text='')
-    
+
 
 def update_temps():
     global incoming
     if ser is not None and ser.isOpen():
         try:
-            incoming = ser.read(1000)   
+            incoming = ser.read(1000)
             ser.write('E'.encode())
             temps_read = [float(x)/10 for x in incoming.decode().split('+')]
             temps_read = temps_read[1:6]
@@ -131,8 +131,8 @@ def update_temps():
             else:
                 return([0,0,0,0,0])
         except: return([0,0,0,0,0])
-    
-    
+
+
 def test_user():
     user_id = id_entry.get()
     if user_id == '':
@@ -148,16 +148,16 @@ def start_save():
         if not os.path.exists(folder):
             os.makedirs(folder)
         user_id = id_entry.get()
-        with open(( folder +sep+ user_id +'_' + current_time +'.csv'), mode='a', newline='') as file:
+        with open(( folder +sep+ user_id +'_' + current_time +'T5.csv'), mode='a', newline='') as file:
             writer = csv.writer(file)
-            writer.writerow(["participant_id", "TrialType", "Temp","datetime"])  
-            
+            writer.writerow(["participant_id", "TrialType", "Temp","datetime"])
+
 def save_results(data1,concept):
     global folder
     user_id = id_entry.get()
-    with open((folder +sep+ user_id +'_' + current_time +'.csv'), mode='a', newline='') as file:
+    with open((folder +sep+ user_id +'_' + current_time +'T5.csv'), mode='a', newline='') as file:
         writer = csv.writer(file)
-        writer.writerow([user_id, concept, data1, datetime.datetime.now().time()])     
+        writer.writerow([user_id, concept, data1, datetime.datetime.now().time()])
 
 def send_tempsFC():
     global ser
@@ -166,7 +166,7 @@ def send_tempsFC():
     if int(dataS)<10:
         dataS = '0' + dataS
     data = 'C0' +dataS+ '0'
-    send_data(data)   
+    send_data(data)
     time.sleep(0.1)
     send_data('D005000') # stimulation time = 10s
     time.sleep(0.1)
@@ -183,7 +183,7 @@ def send_tempsFH():
     if int(dataS)<10:
         dataS = '0' + dataS
     data = 'C0' +dataS+ '0'
-    send_data(data)   
+    send_data(data)
     time.sleep(0.1)
     send_data('D005000') # stimulation time = 5s
     time.sleep(0.1)
@@ -194,14 +194,14 @@ def send_tempsFH():
     famiH_button.after(4000, lambda: famiH_button.config(state="normal"))
 
 
-    
+
 def send_tempsTSP():
     global ser
     dataS = send_varTSP.get()
     if int(dataS)<10:
         dataS = '0' + dataS
     data = 'C0' +dataS+ '0'
-    send_data(data)   
+    send_data(data)
     time.sleep(0.01)
     send_data('D000500') # stimulation time = 5s
     time.sleep(0.01)
@@ -210,7 +210,7 @@ def send_tempsTSP():
     send_buttonTSP.config(state="disabled")
     save_buttonTSP.config(state="normal")  # disable the button
     send_buttonTSP.after(500, lambda: send_buttonTSP.config(state="normal"))  # enable the button after 500 ms
-    
+
 
 def send_tempsCPM():
     global ser
@@ -218,7 +218,7 @@ def send_tempsCPM():
     if int(dataS)<10:
         dataS = '0' + dataS
     data = 'C0' +dataS+ '0'
-    send_data(data)   
+    send_data(data)
     time.sleep(0.01)
     send_data('D010000') # stimulation time = 5s
     time.sleep(0.01)
@@ -227,7 +227,7 @@ def send_tempsCPM():
     send_buttonCPM.config(state="disabled")
     save_buttonCPM.config(state="normal")  # disable the button
     send_buttonCPM.after(9000, lambda: send_buttonCPM.config(state="normal"))  # enable the button after 500 ms
-    
+
 
 
 def save_tempTSP():
@@ -242,8 +242,8 @@ def save_tempCPM():
         save_results(send_varCPM.get(),'tempCPM')
         start_time = time.time() + 10
         countdown()
-        
-        
+
+
 def save_scoreTSP():
     global startTempTSP
     if test_user():
@@ -251,39 +251,39 @@ def save_scoreTSP():
         send_labelTSP.config(text='Previous Temp:'+ str(send_varTSP.get())+ 'C;    Next:')
         save_buttonTSP.config(state="disabled")  # disable the button
         #save_button0.after(200, lambda: save_button0.config(state="normal"))  # enable the button after 500 ms
-        if score_scaleTSP.get()<5: 
+        if score_scaleTSP.get()<5:
             startTempTSP= int(send_varTSP.get())+1
-        elif score_scaleTSP.get()>5: 
-            startTempTSP= int(send_varTSP.get())-1   
+        elif score_scaleTSP.get()>5:
+            startTempTSP= int(send_varTSP.get())-1
         send_varTSP.set(valuesTSP[startTempTSP-5])
-           
-    
+
+
 def save_scoreTSPT1():
     global start_time
     if test_user():
         save_buttonTSPT1.config(state="disabled")
         temps_labelTSPT1.config(text='TSP T1: '+ send_varTSP.get()+ ' C')
         save_results(send_varTSP.get(),'TSP_threshold1')
-        temps_message.config(text="Next Step: CPM Threshold 1") 
+        temps_message.config(text="Next Step: CPM Threshold 1")
         TSPVal.append(int(send_varTSP.get()))
         startTempTSP =45 #reset temp
         send_varTSP.set(valuesTSP[startTempTSP-5])
         start_time = time.time() + 90
         countdown()
-        
+
 def save_scoreTSPT2():
     global start_time
     if test_user():
         save_buttonTSPT2.config(state="disabled")
         temps_labelTSPT2.config(text='TSP T2: ' + send_varTSP.get() +' C')
         save_results(send_varTSP.get(),'TSP_threshold2')
-        temps_message.config(text="Next Step: CPM Threshold 2") 
+        temps_message.config(text="Next Step: CPM Threshold 2")
         TSPVal.append(int(send_varTSP.get()))
         m1 = sum(TSPVal)/2
         temps_labelmeanTSP.config(text='Mean TSP: ' + str(m1) +' C')
         start_time = time.time() + 90
         countdown()
-        
+
 
 def save_scoreCPM():
     global startTempCPM
@@ -292,19 +292,19 @@ def save_scoreCPM():
         send_labelCPM.config(text='Previous Temp:'+ str(send_varCPM.get())+ 'C;    Next:')
         save_buttonCPM.config(state="disabled")  # disable the button
         #save_button0.after(200, lambda: save_button0.config(state="normal"))  # enable the button after 500 ms
-        if score_scaleCPM.get()<5: 
+        if score_scaleCPM.get()<5:
             startTempCPM = int(send_varCPM.get())+1
-        elif score_scaleCPM.get()>5: 
-            startTempCPM = int(send_varCPM.get())-1   
+        elif score_scaleCPM.get()>5:
+            startTempCPM = int(send_varCPM.get())-1
         send_varCPM.set(valuesCPM[startTempCPM-5])
-        
+
 def save_scoreCPMT1():
     global start_time
     if test_user():
         save_buttonCPMT1.config(state="disabled")
         temps_labelCPMT1.config(text='CPM T1: '+ send_varCPM.get()+ ' C')
         save_results(send_varCPM.get(),'CPM_threshold1')
-        temps_message.config(text="Next Step: TSP Threshold 2") 
+        temps_message.config(text="Next Step: TSP Threshold 2")
         CPMVal.append(int(send_varCPM.get()))
         startTempCPM =45 #reset temp
         send_varCPM.set(valuesCPM[startTempCPM-5])
@@ -318,9 +318,9 @@ def save_scoreCPMT2():
         CPMVal.append(int(send_varCPM.get()))
         m2 = sum(CPMVal)/2
         temps_labelmeanCPM.config(text='Mean CPM: ' + str(m2) +' C')
-        temps_message.config(text="Finish!") 
+        temps_message.config(text="Finish!")
 
-        
+
 datax = [0]
 y1 = [0]
 y2 = [0]
@@ -381,7 +381,7 @@ def toggle_plot():
 
 
 
-    
+
 ser = None
 
 
@@ -438,7 +438,7 @@ famiC_label = tk.Label(fami_frame, text="Cold:", width=5, pady=1)
 famiC_label.pack(side=tk.LEFT)
 valuesFC = list(range(0, 20))
 famiC_var = tk.StringVar()
-famiC_var.set(valuesFC[0])  
+famiC_var.set(valuesFC[0])
 famiC_entry = tk.Spinbox(fami_frame, from_=0, to=20, increment=1, textvariable=famiC_var, width=3)
 famiC_entry.pack(side=tk.LEFT)
 famiC_button = tk.Button(fami_frame, text="Stimulate!", command=send_tempsFC, state="disabled")
@@ -448,7 +448,7 @@ famiH_label = tk.Label(fami_frame, text="Heat:", width=5)
 famiH_label.pack(side=tk.LEFT, padx=(40, 0))
 valuesFH = list(range(40, 50))
 famiH_var = tk.StringVar()
-famiH_var.set(valuesFH[5])  
+famiH_var.set(valuesFH[5])
 famiH_entry = tk.Spinbox(fami_frame, from_=40, to=50, increment=1, textvariable=famiH_var, width=3)
 famiH_entry.pack(side=tk.LEFT)
 famiH_button = tk.Button(fami_frame, text="Stimulate!", command=send_tempsFH, state="disabled")
@@ -576,7 +576,3 @@ update_temps()
 refresh()
 root.protocol("WM_DELETE_WINDOW", on_close)
 root.mainloop()
-
-
-
-

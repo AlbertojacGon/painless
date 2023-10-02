@@ -56,7 +56,7 @@ def start_rec():
     global folder, STOP, time_cont
     if test_user():
         user_id = id_entry.get()
-        explore.record_data(file_name=(folder + sep + user_id + current_time+'_' + str(time_cont)), duration=eeg_duration, file_type='csv')
+        explore.record_data(file_name=(folder + sep + user_id + current_time+'_' + str(time_cont)+'rsEEG'), duration=eeg_duration, file_type='csv')
         explore.set_marker(code=888)
         stop_button.config(state="normal")
         start_button.config(state="disabled")
@@ -102,7 +102,7 @@ def save_comments():
             os.makedirs(folder)
         user_id = id_entry.get()
         notes = notes_entry.get()
-        with open((folder +sep+ user_id +'_' + current_time +'NOTES.csv'), mode='a', newline='') as file:
+        with open((folder +sep+ user_id +'_' + current_time +'NOTESrsEEG.csv'), mode='a', newline='') as file:
             writer = csv.writer(file)
             writer.writerow([user_id, 'COMMENT', notes,get_local_time()])
         notes_save_button.config(state="disabled")  # disable the button
@@ -112,7 +112,7 @@ def save_comments():
 def save_handUp():
     global folder
     user_id = id_entry.get()
-    with open((folder +sep+ user_id +'_' + current_time +'NOTES.csv'), mode='a', newline='') as file:
+    with open((folder +sep+ user_id +'_' + current_time +'NOTESrsEEG.csv'), mode='a', newline='') as file:
         writer = csv.writer(file)
         writer.writerow([user_id, 'HAND UP', ' ',get_local_time()])
         handdwButt.config(state="normal")
@@ -122,7 +122,7 @@ def save_handUp():
 def save_handDw():
     global folder
     user_id = id_entry.get()
-    with open((folder +sep+ user_id +'_' + current_time +'NOTES.csv'), mode='a', newline='') as file:
+    with open((folder +sep+ user_id +'_' + current_time +'NOTESrsEEG.csv'), mode='a', newline='') as file:
         writer = csv.writer(file)
         writer.writerow([user_id, 'HAND DOWN',' ', get_local_time()])
         handdwButt.config(state="disabled")
@@ -131,7 +131,7 @@ def save_handDw():
 def save_pain():
     global folder
     user_id = id_entry.get()
-    with open((folder +sep+ user_id +'_' + current_time +'NOTES.csv'), mode='a', newline='') as file:
+    with open((folder +sep+ user_id +'_' + current_time +'NOTESrsEEG.csv'), mode='a', newline='') as file:
         writer = csv.writer(file)
         writer.writerow([user_id, 'FinalPain', pain_scale.get() ,get_local_time()])
         pain_saved_label.config(text='Done')

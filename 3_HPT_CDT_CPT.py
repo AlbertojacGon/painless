@@ -9,7 +9,7 @@ Created on Thu Feb 16 10:38:45 2023
 
 
 
-import serial 
+import serial
 import csv, time, os
 import tkinter as tk
 import serial.tools.list_ports
@@ -37,8 +37,8 @@ def read_data(): # read serial
         while ser.inWaiting():
             incoming = incoming + ser.read().decode()
         return(incoming)
-    
-    
+
+
 def connect():
     global ser
     port_idx = port_listbox.curselection()[0] # Obtiene el índice de la selección actual
@@ -57,7 +57,7 @@ def connect():
         time.sleep(0.05)
         send_data('N320')
         time.sleep(0.05)
-        
+
     except serial.SerialException:
         status_label.config(text="Error: Could not connect to " + port)
 
@@ -81,7 +81,7 @@ def on_close():
         ser.close()
     root.destroy()
 
-# countdown 
+# countdown
 
 def countdown():
     global start_time
@@ -98,7 +98,7 @@ def reset_countdown():
     global start_time
     start_time = None
     countdown_label.config(text='')
-    
+
 
 def update_temps():
     global incoming
@@ -106,17 +106,17 @@ def update_temps():
         try:
             ser.write('E'.encode())
             time.sleep(.02)
-            incoming = ser.read(1000)   
-            
+            incoming = ser.read(1000)
+
             temps_read = [float(x)/10 for x in incoming.decode().split('+')]
             temps_read = temps_read[1:6]
-            if len(temps_read)==5:       
+            if len(temps_read)==5:
                 return(temps_read)
             else:
                 return([0,0,0,0,0])
         except: return([0,0,0,0,0])
-    
-    
+
+
 def test_user():
     user_id = id_entry.get()
     if user_id == '':
@@ -124,7 +124,7 @@ def test_user():
         return False
     else:
         return True
-    
+
 def start_save():
     global folder
     user= test_user()
@@ -132,22 +132,22 @@ def start_save():
         user_id = id_entry.get()
         if not os.path.exists(folder):
             os.makedirs(folder)
-        with open((folder +sep+ user_id +'_' + current_time +'.csv'), mode='a', newline='') as file:
+        with open((folder +sep+ user_id +'_' + current_time +'HPT_CDT_CPT.csv'), mode='a', newline='') as file:
             writer = csv.writer(file)
-            writer.writerow(["participant_id", "TrialType", "meanTemp","ReactionTime","AllTemps", "datetime"])     
-        
+            writer.writerow(["participant_id", "TrialType", "meanTemp","ReactionTime","AllTemps", "datetime"])
+
 def save_results(mTemp,RT,temps,concept):
     global folder
     user_id = id_entry.get()
-    with open((folder +sep+ user_id +'_' + current_time +'.csv'), mode='a', newline='') as file:
+    with open((folder +sep+ user_id +'_' + current_time +'HPT_CDT_CPT.csv'), mode='a', newline='') as file:
         writer = csv.writer(file)
-        writer.writerow([user_id, concept, mTemp,RT,temps, datetime.datetime.now().time()])     
+        writer.writerow([user_id, concept, mTemp,RT,temps, datetime.datetime.now().time()])
 
 
-    
+
 def CDT(trialN):
     global start_time
-    send_data('D099990') 
+    send_data('D099990')
     time.sleep(0.003)
     send_data('V00010')
     time.sleep(0.003)
@@ -157,20 +157,20 @@ def CDT(trialN):
     time.sleep(0.005)
     send_data('L')
     time.sleep(0.005)
-    T0 = time.time() 
+    T0 = time.time()
     cont = 1
     while True:
         send_data('K')
         time.sleep(0.003)
         pushbutton = read_data()
-        T1 = time.time()-T0 
+        T1 = time.time()-T0
         if pushbutton:
             pushbutton = int(pushbutton)
             if pushbutton == 1:
                 curr_temps = update_temps()
                 send_data('C0320')
                 time.sleep(0.003)
-                send_data('D000900') 
+                send_data('D000900')
                 time.sleep(0.003)
                 send_data('V01700')
                 time.sleep(0.003)
@@ -191,17 +191,17 @@ def CDT(trialN):
                     start_time = time.time() + 5
                     countdown()
                 tempCP_message.config(text=("Temp:"))
-                break  
+                break
         if T1>cont:
             curr_temps = update_temps()
             tempCP_message.config(text=("Temp: {:.1f}C".format(mean(curr_temps))))
             cont+=1
         root.update()
-            
+
 
 def CPT(trialN):
     global start_time
-    send_data('D099990') 
+    send_data('D099990')
     time.sleep(0.003)
     send_data('V00010')
     time.sleep(0.003)
@@ -211,18 +211,18 @@ def CPT(trialN):
     time.sleep(0.005)
     send_data('L')
     time.sleep(0.005)
-    T0 = time.time() 
+    T0 = time.time()
     cont = 1
     while True:
         send_data('K')
         time.sleep(0.003)
         pushbutton = read_data()
-        T1 = time.time()-T0 
+        T1 = time.time()-T0
         if pushbutton:
             pushbutton = int(pushbutton)
             if pushbutton == 1:
                 curr_temps = update_temps()
-                send_data('D009000') 
+                send_data('D009000')
                 time.sleep(0.003)
                 send_data('C0320')
                 time.sleep(0.003)
@@ -243,8 +243,8 @@ def CPT(trialN):
                     CPT3_label.config(text=("Temp: {:.1f}C".format(mean(curr_temps))))
                     temps_message.config(text="Done!")
                 tempCP_message.config(text=("Temp:"))
-                
-                break  
+
+                break
         if T1>cont:
             curr_temps = update_temps()
             tempCP_message.config(text=("Temp: {:.1f}C".format(mean(curr_temps))))
@@ -254,7 +254,7 @@ def CPT(trialN):
 
 def HPT(trialN):
     global start_time
-    send_data('D099990') 
+    send_data('D099990')
     time.sleep(0.003)
     send_data('V00010')
     time.sleep(0.003)
@@ -264,18 +264,18 @@ def HPT(trialN):
     time.sleep(0.005)
     send_data('L')
     time.sleep(0.005)
-    T0 = time.time() 
+    T0 = time.time()
     cont = 1
     while True:
         send_data('K')
         time.sleep(0.003)
         pushbutton = read_data()
-        T1 = time.time()-T0 
+        T1 = time.time()-T0
         if pushbutton:
             pushbutton = int(pushbutton)
             if pushbutton == 1:
                 curr_temps = update_temps()
-                send_data('D009000') 
+                send_data('D009000')
                 time.sleep(0.003)
                 send_data('C0320')
                 time.sleep(0.003)
@@ -298,14 +298,14 @@ def HPT(trialN):
                     start_time = time.time() + 120
                     countdown()
                 tempCP_message.config(text=("Temp:"))
-                break  
+                break
         if T1>cont:
             curr_temps = update_temps()
             tempCP_message.config(text=("Temp: {:.1f}C".format(mean(curr_temps))))
             cont+=1
         root.update()
-                
-        
+
+
 
 
 
@@ -368,7 +368,7 @@ def toggle_plot():
 
 
 
-    
+
 ser = None
 serCPM = None
 
@@ -533,4 +533,3 @@ update_temps()
 refresh()
 root.protocol("WM_DELETE_WINDOW", on_close)
 root.mainloop()
-

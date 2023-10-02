@@ -9,7 +9,7 @@ Created on Thu Feb 16 10:38:45 2023
 
 
 
-import serial 
+import serial
 import csv, time, os
 import tkinter as tk
 import serial.tools.list_ports
@@ -37,8 +37,8 @@ def read_data(): # read serial
         while ser.inWaiting():
             incoming = incoming + ser.read().decode()
         return(incoming)
-    
-    
+
+
 def connect():
     global ser
     port_idx = port_listbox.curselection()[0] # Obtiene el índice de la selección actual
@@ -82,8 +82,8 @@ def refresh():
     port_listbox.delete(0, tk.END)
     for port, desc, hwid in sorted(ports):
         port_listbox.insert(tk.END, port)
-        
-        
+
+
 def connectVAS():
     global start_time
     global ser
@@ -95,7 +95,7 @@ def connectVAS():
         serVAS = serial.Serial(portVAS, baud_rate, timeout=0)
         statusVAS_label.config(text="eVAS Connected to " + portVAS)
         connectVAS_button.config(state="disabled")
-        disconnectVAS_button.config(state="normal")  
+        disconnectVAS_button.config(state="normal")
         if ser is not None and serVAS is not None:
             fam_button.config(state="normal")
             control_button.config(state="normal")
@@ -106,7 +106,7 @@ def connectVAS():
                 serVAS.read()
         start_time = time.time()
         temps_message.config(text="Select the correct OA Pain5 temp and start familiarization")
-        
+
     except serial.SerialException:
         statusVAS_label.config(text="Error: Could not connect to " + portVAS)
 
@@ -124,7 +124,7 @@ def refreshVAS():
     portVAS_listbox.delete(0, tk.END)
     for portVAS, desc, hwid in sorted(portsVAS):
         portVAS_listbox.insert(tk.END, portVAS)
-        
+
 def on_close():
     if ser:
         ser.close()
@@ -132,7 +132,7 @@ def on_close():
         serVAS.close()
     root.destroy()
 
-# countdown 
+# countdown
 
 def countdown():
     global start_time
@@ -149,7 +149,7 @@ def reset_countdown():
     global start_time
     start_time = None
     countdown_label.config(text='')
-    
+
 
 def update_temps():
     global incoming
@@ -157,17 +157,17 @@ def update_temps():
         try:
             ser.write('E'.encode())
             time.sleep(.02)
-            incoming = ser.read(1000)   
-            
+            incoming = ser.read(1000)
+
             temps_read = [float(x)/10 for x in incoming.decode().split('+')]
             temps_read = temps_read[1:6]
-            if len(temps_read)==5:       
+            if len(temps_read)==5:
                 return(temps_read)
             else:
                 return([0,0,0,0,0])
         except: return([0,0,0,0,0])
-    
-    
+
+
 def update_VAS():
     global incomingVAS
     if serVAS is not None and serVAS.isOpen():
@@ -182,8 +182,8 @@ def update_VAS():
                 if valVas!=999:
                     tempCP_message.config(text = ("VAS Value: " + str(valVas)))
     root.after(1, update_VAS)
-    
-    
+
+
 def test_user():
     user_id = id_entry.get()
     if user_id == '':
@@ -199,23 +199,23 @@ def start_save():
         if not os.path.exists(folder):
             os.makedirs(folder)
         user_id = id_entry.get()
-        with open((folder +sep+ user_id +'_' + current_time +'.csv'), mode='a', newline='') as file:
+        with open((folder +sep+ user_id +'_' + current_time +'OA.csv'), mode='a', newline='') as file:
             writer = csv.writer(file)
-            writer.writerow(["participant_id", "TrialType", "Temp", "VAS", "Time"])  
-            
+            writer.writerow(["participant_id", "TrialType", "Temp", "VAS", "Time"])
+
 def save_results(temp,concept,time,vas):
     global folder
     user_id = id_entry.get()
-    with open((folder +sep+ user_id +'_' + current_time +'.csv'), mode='a', newline='') as file:
+    with open((folder +sep+ user_id +'_' + current_time +'OA.csv'), mode='a', newline='') as file:
         writer = csv.writer(file)
-        writer.writerow([user_id, concept, temp, vas, time])     
+        writer.writerow([user_id, concept, temp, vas, time])
 
 
 
-    
+
 def stimFami():
     global ser
-    global start_time    
+    global start_time
     fam_button.config(state="disabled")
     control_button.config(state="disabled")
     offset_button.config(state="disabled")
@@ -224,7 +224,7 @@ def stimFami():
     dataS = dataS-2
     datstr = str(dataS).replace('.','')
     data = 'C0' +datstr
-    send_data(data)   
+    send_data(data)
     time.sleep(0.003)
     send_data('D010000') # stimulation time = 10s
     time.sleep(0.003)
@@ -233,9 +233,9 @@ def stimFami():
     StartOAtime = time.time()
     start_time = time.time()
     save_results(dataS,'Familiarization',time.time()-start_time,'')
-    temps_message.config(text=("Familiarization. Rate pain continuously. Temp:" + str(dataS)+ "C")) 
+    temps_message.config(text=("Familiarization. Rate pain continuously. Temp:" + str(dataS)+ "C"))
     cont = 0
-    tWait = 10 
+    tWait = 10
     while cont<=tWait:
         if (time.time()- StartOAtime)>cont:
             countdown_label.config(text=str(tWait-cont))
@@ -246,17 +246,17 @@ def stimFami():
     fam_button.config(state="normal")
     control_button.config(state="normal")
     offset_button.config(state="normal")
-    
+
 def stimControl():
     global ser
-    global start_time    
+    global start_time
     fam_button.config(state="disabled")
     control_button.config(state="disabled")
     offset_button.config(state="disabled")
     dataS = float(temp_spinbox.get())
     datstr = str(dataS).replace('.','')
     data = 'C0' +datstr
-    send_data(data)   
+    send_data(data)
     time.sleep(0.003)
     send_data('D030000') # stimulation time = 30s
     time.sleep(0.003)
@@ -265,9 +265,9 @@ def stimControl():
     StartOAtime = time.time()
     start_time = time.time()
     save_results(dataS,'Control',time.time()-start_time,'')
-    temps_message.config(text=("Control. Rate pain continuously. Temp:" + str(dataS)+ "C")) 
+    temps_message.config(text=("Control. Rate pain continuously. Temp:" + str(dataS)+ "C"))
     cont = 0
-    tWait = 30 
+    tWait = 30
     while cont<=tWait:
         if (time.time()- StartOAtime)>cont:
             countdown_label.config(text=str(tWait-cont))
@@ -278,18 +278,18 @@ def stimControl():
     fam_button.config(state="normal")
     control_button.config(state="normal")
     offset_button.config(state="normal")
-    
+
 
 def stimOA():
     global ser
-    global start_time    
+    global start_time
     fam_button.config(state="disabled")
     control_button.config(state="disabled")
     offset_button.config(state="disabled")
     dataS = float(temp_spinbox.get())
     datstr = str(dataS).replace('.','')
     data = 'C0' +datstr
-    send_data(data)   
+    send_data(data)
     time.sleep(0.003)
     send_data('D020500') # stimulation time = 5s, here will be controlled by tWait
     time.sleep(0.003)
@@ -298,27 +298,27 @@ def stimOA():
     StartOAtime = time.time()
     start_time = time.time()
     save_results(dataS,'OA_Pre',time.time()-start_time,'')
-    temps_message.config(text="OA. Rate pain continuously. Temp: " + str(dataS)+ "C") 
+    temps_message.config(text="OA. Rate pain continuously. Temp: " + str(dataS)+ "C")
     cont = 0
-    tWait = 5 
+    tWait = 5
     while cont<=tWait:
         if (time.time()- StartOAtime+.4)>cont:
             countdown_label.config(text=str(tWait-cont))
             cont+=1
             countdown_label.update_idletasks()
         root.update()
-        
+
     dataS = dataS+1
     datstr = str(dataS).replace('.','')
     data = 'C0' +datstr
-    send_data(data)   
+    send_data(data)
     time.sleep(0.003)
     while (time.time()- StartOAtime+.01)<tWait:
         root.update()
-        
+
     send_data('L')
     save_results(dataS,'OA+1',time.time()-start_time,'')
-    temps_message.config(text="OA+1C. Rate pain continuously. Temp: " + str(dataS)+ "C") 
+    temps_message.config(text="OA+1C. Rate pain continuously. Temp: " + str(dataS)+ "C")
     cont = 5
     tWait = 10
     while cont<=tWait:
@@ -327,33 +327,33 @@ def stimOA():
             cont+=1
             countdown_label.update_idletasks()
         root.update()
-    
+
     dataS = dataS-1
     datstr = str(dataS).replace('.','')
     data = 'C0' +datstr
-    send_data(data)   
+    send_data(data)
     time.sleep(0.003)
     while (time.time()- StartOAtime+.01)<tWait:
         root.update()
     send_data('L')
     save_results(dataS,'OA_Post',time.time()-start_time,'')
-    temps_message.config(text="OA. Rate pain continuously. Temp: " + str(dataS)+ "C") 
+    temps_message.config(text="OA. Rate pain continuously. Temp: " + str(dataS)+ "C")
     cont = 10
-    tWait = 30 
+    tWait = 30
     while cont<=tWait:
         if (time.time()- StartOAtime+.2)>cont:
             countdown_label.config(text=str(tWait-cont))
             cont+=1
             countdown_label.update_idletasks()
         root.update()
-    send_data('C0320')   
+    send_data('C0320')
     time.sleep(0.003)
     while (time.time()- StartOAtime+.01)<tWait:
         root.update()
     send_data('L')
     save_results(dataS,'OA_END',time.time()-start_time,'')
     info_oa_label.config(text="Done")
-    temps_message.config(text="OA Finished") 
+    temps_message.config(text="OA Finished")
     fam_button.config(state="normal")
     control_button.config(state="normal")
     offset_button.config(state="normal")
@@ -419,7 +419,7 @@ def toggle_plot():
 
 
 
-    
+
 ser = None
 serVAS = None
 
@@ -596,4 +596,3 @@ refreshVAS()
 update_VAS()
 root.protocol("WM_DELETE_WINDOW", on_close)
 root.mainloop()
-
