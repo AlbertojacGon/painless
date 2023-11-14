@@ -176,17 +176,17 @@ def CDT(trialN):
                 time.sleep(0.003)
                 send_data('C0320')
                 if trialN==1:
-                    save_results(mean(curr_temps),T1, curr_temps, 'CDT1')
+                    save_results(round(mean(curr_temps),2),T1, curr_temps, 'CDT1')
                     CDT1_label.config(text=("Temp: {:.1f}C".format(mean(curr_temps))))
                     start_time = time.time() + 5
                     countdown()
                 elif trialN==2:
-                    save_results(mean(curr_temps),T1, curr_temps, 'CDT2')
+                    save_results(round(mean(curr_temps),2),T1, curr_temps, 'CDT2')
                     CDT2_label.config(text=("Temp: {:.1f}C".format(mean(curr_temps))))
                     start_time = time.time() + 5
                     countdown()
                 elif trialN==3:
-                    save_results(mean(curr_temps),T1, curr_temps, 'CDT3')
+                    save_results(round(mean(curr_temps),2),T1, curr_temps, 'CDT3')
                     CDT3_label.config(text=("Temp: {:.1f}C".format(mean(curr_temps))))
                     start_time = time.time() + 5
                     countdown()
@@ -229,17 +229,17 @@ def CPT(trialN):
                 send_data('V00080')
                 time.sleep(0.003)
                 if trialN==1:
-                    save_results(mean(curr_temps),T1, curr_temps, 'CPT1')
+                    save_results(round(mean(curr_temps),2),T1, curr_temps, 'CPT1')
                     CPT1_label.config(text=("Temp: {:.1f}C".format(mean(curr_temps))))
                     start_time = time.time() + 5 + int((32-mean(curr_temps))/8)
                     countdown()
                 elif trialN==2:
-                    save_results(mean(curr_temps),T1, curr_temps, 'CPT2')
+                    save_results(round(mean(curr_temps),2),T1, curr_temps, 'CPT2')
                     CPT2_label.config(text=("Temp: {:.1f}C".format(mean(curr_temps))))
                     start_time = time.time() + 5 + int((32-mean(curr_temps))/8)
                     countdown()
                 elif trialN==3:
-                    save_results(mean(curr_temps),T1, curr_temps, 'CPT3')
+                    save_results(round(mean(curr_temps),2),T1, curr_temps, 'CPT3')
                     CPT3_label.config(text=("Temp: {:.1f}C".format(mean(curr_temps))))
                     temps_message.config(text="Done!")
                 tempCP_message.config(text=("Temp:"))
@@ -282,18 +282,18 @@ def HPT(trialN):
                 send_data('V00080')
                 time.sleep(0.003)
                 if trialN==1:
-                    save_results(mean(curr_temps),T1, curr_temps, 'HPT1')
+                    save_results(round(mean(curr_temps),2),T1, curr_temps, 'HPT1')
                     HPT1_label.config(text=("Temp: {:.1f}C".format(mean(curr_temps))))
                     temps_message.config(text="Wait:")
                     start_time = time.time() + 5+ int((mean(curr_temps)-32)/8)
                     countdown()
                 elif trialN==2:
-                    save_results(mean(curr_temps),T1, curr_temps, 'HPT2')
+                    save_results(round(mean(curr_temps),2),T1, curr_temps, 'HPT2')
                     HPT2_label.config(text=("Temp: {:.1f}C".format(mean(curr_temps))))
                     start_time = time.time() + 5+ int((mean(curr_temps)-32)/8)
                     countdown()
                 elif trialN==3:
-                    save_results(mean(curr_temps),T1, curr_temps, 'HPT3')
+                    save_results(round(mean(curr_temps),2),T1, curr_temps, 'HPT3')
                     HPT3_label.config(text=("Temp: {:.1f}C".format(mean(curr_temps))))
                     start_time = time.time() + 120
                     countdown()
